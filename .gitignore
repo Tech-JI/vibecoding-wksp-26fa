@@ -1,0 +1,31 @@
+# Local research, downloaded references, and temporary tools/previews
+/downloads/
+/references/
+/tmp/
+
+# Generated PDFs, previews, and source archives (rebuild with make)
+/output/
+
+# Original chart captures; presentation copies live under slides/assets/
+/Artificial Analysis Intelligence Index (13 Nov '26).png
+/Intelligence Index vs- Cost to Run Artificial Analysis Intelligence Index (13 Nov '26).png
+
+# macOS metadata and local environment/cache files
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+
+# TeX build intermediates
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.synctex.gz
+*.fls
+*.fdb_latexmk
