@@ -709,8 +709,6 @@ Pick the leaderboard that matches your workload:
 
 \normalsize
 
-# Hands-on Practice
-
 # Going Further
 
 ## References: Concepts & models

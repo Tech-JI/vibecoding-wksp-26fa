@@ -1,6 +1,6 @@
 # Vibe Coding Workshop
 
-The current priority is to develop **`slides/agent-tutorial.md`**: refine the material on agents, complete the hands-on exercises, and check the layout of the generated PDF. Use this deck as the default focus for further work. Its `Hands-on Practice` section currently contains only a heading and needs to be filled in.
+The current priority is to develop **`slides/agent-tutorial.md`**: refine the material on agents and check the layout of the generated PDF. Use this deck as the default focus for further work. Hands-on exercises belong in a separate worksheet.
 
 - Main deck: `slides/agent-tutorial.md`
 - Image assets: `slides/assets/agent-tutorial/`
