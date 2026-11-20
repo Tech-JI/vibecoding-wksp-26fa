@@ -247,7 +247,7 @@ header-includes: |
   \node[anchor=south west,font=\ttfamily\fontsize{10}{12}\selectfont,text=muted] at (-6.1,3.8) {context window (finite)};
   \node[top] (b1) at (0,3.2) {};
   \node[anchor=west,font=\sffamily\bfseries\fontsize{10}{12}\selectfont,text=white] at (-5.5,3.2) {System prompt};
-  \node[anchor=east,font=\sffamily\fontsize{10}{12}\selectfont,text=white] at (5.5,3.2) {Platform identity, permissions \& top-priority rules};
+  \node[anchor=east,font=\sffamily\fontsize{10}{12}\selectfont,text=white] at (5.5,3.2) {Identity, tools, permissions, folder \& date};
 
   \node[bar,fill=theme!14] (b2) at (0,2.4) {};
   \node[anchor=west,font=\sffamily\bfseries\fontsize{10}{12}\selectfont,text=ink] at (-5.5,2.4) {Project rules};
@@ -311,12 +311,12 @@ header-includes: |
 
 - **Stateless API**: the model remembers nothing; the harness re-sends the whole context every turn
 - **Prefix caching**: when a request starts exactly like the last one, the provider reuses that work
-- **Payoff**: faster replies and cheaper cached input (often 50--90% off)
+- **Payoff**: faster replies and cheaper cached input (often 50--95% off)
 - **So**: keep the start stable, and put lasting facts in files instead of chat history
 
 \normalsize
 
-## AGENTS.md: the project's memory
+## AGENTS.md: the project's house rules
 
 :::::::::::::: {.columns align=center}
 ::: {.column width="52%"}
@@ -325,17 +325,16 @@ header-includes: |
 ```markdown
 # AGENTS.md
 
-## Project
 Personal blog: Astro + AstroPaper
 
-## Commands
-- Dev server: npm run dev
-- Check:      npm run build
+## Before you start
+- Read docs/decisions.md first
 
 ## Rules
-- Run the check before saying "done"
+- Run npm run build before "done"
+- Ask me after each feature; commit
+- No big change without a commit
 - Never edit dist/ or node_modules/
-- Keep each change small; explain it
 ```
 
 \normalsize
@@ -343,10 +342,10 @@ Personal blog: Astro + AstroPaper
 ::: {.column width="46%"}
 \footnotesize
 
-- A Markdown file in the repo root, **loaded at the start of every session**
-- Holds what a new teammate needs: commands, layout, rules
-- Keep it **short** (~100 lines): every line costs tokens on every turn
-- Rules here are only reminders; a repeated mistake needs a **test** (see *Prove it*)
+- Named exactly `AGENTS.md`, in the repo root; added to **every request**
+- **Start with 2--3 lines**: where to look, and lines not to cross
+- **Skip** what the agent can read itself: start scripts, folder layout; details go in `docs/`
+- **A reminder, not a memory**: buried in a long session, it gets ignored; repeated mistakes need a **test**
 - DSH reads `AGENTS.md` and `CLAUDE.md`; Claude Code reads `CLAUDE.md`
 :::
 ::::::::::::::
@@ -439,6 +438,118 @@ Pick the leaderboard that matches your workload:
 - **Diminishing returns**: ~20× the cost buys only ~10 more points
 - **Same model**: Opus 5.5 scores 35 (low) vs. 58 (max) at ~10× the cost
 - **TIP:** Default to medium/high; save max for hard, long-horizon tasks
+
+\normalsize
+
+## What a task really costs
+
+\begin{center}
+\resizebox{0.9\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,line cap=round,line join=round,
+  term/.style={draw=theme,fill=workfill,line width=1.2pt,rounded corners=3pt,minimum width=3.4cm,minimum height=1.0cm,align=center,font=\sffamily\bfseries\fontsize{12}{14}\selectfont,text=ink},
+  op/.style={font=\sffamily\bfseries\fontsize{18}{18}\selectfont,text=muted},
+  note/.style={anchor=north,text width=3.4cm,align=center,font=\sffamily\fontsize{9}{11}\selectfont,text=muted}]
+  \node[term,fill=theme,text=white] (c) at (0,0) {Cost per task};
+  \node[op] at (2.25,0) {$=$};
+  \node[term] (p) at (4.5,0) {Price per token};
+  \node[op] at (6.75,0) {$\times$};
+  \node[term] (t) at (9,0) {Tokens per task};
+  \node[note] at ([yshift=-4pt]c.south) {what you actually pay};
+  \node[note] at ([yshift=-4pt]p.south) {the price list; cache hits are far cheaper};
+  \node[note] at ([yshift=-4pt]t.south) {turns $\times$ context re-sent each turn};
+\end{tikzpicture}
+}%
+\end{center}
+
+\vspace{2pt}
+\footnotesize
+
+- **Price $\neq$ bill**: Opus 5.5 is 2× GPT-6.1 Sol per token, about 6× per task\textsuperscript{*}
+- **Vague prompts multiply turns**: each retry re-sends the whole history
+- **Cache hits are cheap**: Opus 5.5 input is \$0.20/M cached vs. \$4/M fresh
+- **Right the first time**: a strong model can end up the cheapest
+- **TIP:** Compare **\$ per task** on your own work; [mypriors](https://mypriors.com) shows it per model
+
+\begin{flushright}
+\tiny\textcolor{muted}{* Cost per task on the Artificial Analysis Intelligence Index, medium effort, Nov 2026}
+\end{flushright}
+
+\normalsize
+
+## Pay-as-you-go vs. subscription
+
+\footnotesize
+
+<!--prettier-ignore-->
+| | Pay-as-you-go API | Monthly plan |
+| :---------- | :------------------------------ | :------------------------------ |
+| **Best for** | Light use, small projects | Daily use, long sessions |
+| **You pay** | Per token, no ceiling | A flat fee, with usage caps |
+| **Watch for** | Long chats add up | 5-hour & weekly limits |
+
+**Plans change often**
+
+<!--prettier-ignore-->
+| When | Plan | What happened |
+| :-------- | :------------- | :------------------------------------------------ |
+| 2025-06 | Cursor Pro | Switched to usage billing; refunds after backlash |
+| 2026-09 | ChatGPT Pro | Codex limits to be halved; cancelled on 10-29 |
+| 2026-12 | Gemini 4 API | Launch price ends; rates double |
+
+\vspace{2pt}
+
+- **"Worth \$10k a month"** assumes 24/7 use; coursework won't come close
+- **Pay monthly, never yearly**: terms change faster than a year
+- **This workshop**: DeepSeek API, pay-as-you-go
+
+\normalsize
+
+## Third-party providers & relays
+
+:::::::::::::: {.columns align=top}
+::: {.column width="47%"}
+\footnotesize
+**Same model, different host**
+
+\scriptsize
+
+- **Quantized**: weaker at multi-step
+- **Cut context**: Qwen 1M $\to$ 262k
+- **Peak hours**: slow, 1--2 requests
+- **Fine print**: 5-hour & weekly caps
+:::
+::: {.column width="51%"}
+\footnotesize
+**Unknown API relays: just don't**
+
+\vspace{2pt}
+\begin{tikzpicture}[x=0.8cm,y=1cm,line cap=round,line join=round,
+  box/.style={draw=theme,fill=workfill,line width=1pt,rounded corners=3pt,minimum width=1.4cm,minimum height=0.55cm,font=\sffamily\fontsize{7}{9}\selectfont,text=ink},
+  flow/.style={draw=muted!85,line width=1pt,-{Stealth[length=1.8mm,width=1.4mm]}}]
+  \node[box] (a) at (0,0) {Your agent};
+  \node[box,draw=muted!70,fill=white] (r) at (2.45,0) {Relay};
+  \node[box] (m) at (4.9,0) {Model};
+  \draw[flow] (a) -- (r); \draw[flow] (r) -- (m);
+  \node[anchor=north,font=\sffamily\fontsize{7}{9}\selectfont,text=muted,align=center] at ([yshift=-2pt]r.south) {reads everything,\\can rewrite replies};
+\end{tikzpicture}
+
+\scriptsize
+
+- Sees every prompt, file & **API key**
+- Can rewrite your agent's commands
+- **9 of 428** tested injected code
+- **17 of 428** used leaked keys
+:::
+::::::::::::::
+
+\vspace{4pt}
+\footnotesize
+
+- **TIP:** Official API or a host you trust; "80% off official" is a red flag
+
+\begin{flushright}
+\tiny\textcolor{muted}{Relay data: Liu et al., \emph{Your Agent Is Mine}, arXiv:2604.08407 (2026)}
+\end{flushright}
 
 \normalsize
 
@@ -581,14 +692,14 @@ Pick the leaderboard that matches your workload:
 \textbf{Did:}\ \ \ \ \ added Projects list\\
 \textbf{Tests:}\ \ \ 12 passed, 0 failed\\
 \textbf{Shot:}\ \ \ \ shots/projects.png\\
-\textbf{Skipped:} mobile layout};
+\textbf{Skipped:} deploy (localhost only)};
 \end{tikzpicture}
 
 \footnotesize
 
 - No test output, no screenshot: **not done**
 - Visible change? Have it open the page in a real browser and take a screenshot
-- **Skipped** is where bugs hide; read it first
+- **Skipped** is where bugs hide: `localhost` works only on your machine
 
 \normalsize
 :::
@@ -616,6 +727,118 @@ Pick the leaderboard that matches your workload:
 
 \begin{flushright}
 \tiny\textcolor{muted}{Adapted from the \texttt{prove-it} skill in nagi-studio/skills}
+\end{flushright}
+
+## From `localhost` to a real URL
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.86\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,line cap=round,line join=round,
+  lbox/.style={draw=muted!80,fill=white,line width=1.2pt,rounded corners=3pt,minimum width=3.6cm,minimum height=1.2cm,align=center,font=\sffamily\fontsize{10}{12}\selectfont,text=ink},
+  cbox/.style={draw=theme,fill=theme!14,line width=1.3pt,rounded corners=3pt,minimum width=3.6cm,minimum height=1.2cm,align=center,font=\sffamily\fontsize{10}{12}\selectfont,text=ink},
+  rbox/.style={draw=theme,fill=workfill,line width=1.3pt,rounded corners=3pt,minimum width=3.6cm,minimum height=1.2cm,align=center,font=\sffamily\fontsize{10}{12}\selectfont,text=ink},
+  flow/.style={draw=theme,line width=1.3pt,-{Stealth[length=2.4mm,width=1.8mm]}}]
+  \node[lbox] (loc) at (0,0) {\textbf{Your laptop}\\\texttt{localhost:4321}};
+  \node[cbox] (host) at (5.2,0) {\textbf{Static hosting}\\builds \texttt{dist/}};
+  \node[rbox] (pub) at (10.4,0) {\textbf{Public URL}\\opens on any phone};
+  \draw[flow] (loc.east) -- node[above,font=\ttfamily\scriptsize,text=muted] {git push} (host.west);
+  \draw[flow] (host.east) -- (pub.west);
+\end{tikzpicture}
+}%
+\end{figure}
+
+\footnotesize
+
+<!--prettier-ignore-->
+| Your site | Host on | You maintain |
+| :-------------------- | :-------------------------- | :--------------- |
+| **Pages only** (blog) | GitHub / Cloudflare Pages | Almost nothing |
+| **Shared data** | Serverless + database | Env vars, data |
+| **Anything** | Your own server | Updates, backups |
+
+\normalsize
+\vspace{4pt}
+\footnotesize
+
+- **You do**: sign-up, ID check, payment; never hand the agent your password
+- **Secrets** go in the platform's env vars, never in page code anyone can read
+- **Test like a user**: open it on a friend's phone; data must survive a refresh
+
+\normalsize
+
+## Why long sessions get dumber
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.86\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,line cap=round,line join=round,
+  blk/.style={draw=theme,line width=1pt,rounded corners=2pt,minimum width=4.6cm,font=\sffamily\fontsize{9}{11}\selectfont,align=center},
+  sys/.style={blk,fill=theme,text=white,minimum height=0.5cm},
+  rul/.style={blk,fill=theme!14,text=ink,minimum height=0.5cm},
+  task/.style={blk,fill=workfill,text=ink,font=\sffamily\bfseries\fontsize{10}{12}\selectfont},
+  junk/.style={blk,draw=muted!70,fill=muted!15,text=muted,minimum height=0.5cm},
+  ttl/.style={font=\sffamily\bfseries\fontsize{10}{12}\selectfont,text=ink}]
+  % fresh session
+  \node[ttl] at (0,4.25) {Fresh session};
+  \node[sys] at (0,3.7) {system prompt};
+  \node[rul] at (0,3.15) {\texttt{AGENTS.md}};
+  \node[task,minimum height=1.6cm] at (0,2.0) {your task};
+  \node[font=\sffamily\fontsize{9}{11}\selectfont,text=muted] at (0,0.55) {room to think};
+  \draw[draw=muted!75,line width=1pt,dashed,rounded corners=4pt] (-2.5,0.0) rectangle (2.5,4.0);
+  % long session
+  \node[ttl] at (6.6,4.25) {Long session};
+  \node[sys] at (6.6,3.7) {system prompt};
+  \node[rul] at (6.6,3.15) {\texttt{AGENTS.md}};
+  \node[junk] at (6.6,2.6) {old chat \& abandoned plans};
+  \node[junk] at (6.6,2.05) {stale drafts \& dead code};
+  \node[junk] at (6.6,1.5) {3,000-line file dumps};
+  \node[junk] at (6.6,0.95) {unused MCPs \& skills};
+  \node[task,minimum height=0.42cm,font=\sffamily\bfseries\fontsize{9}{11}\selectfont] at (6.6,0.4) {your task};
+  \draw[draw=muted!75,line width=1pt,dashed,rounded corners=4pt] (4.1,0.0) rectangle (9.1,4.0);
+  \draw[-{Stealth[length=7pt]},draw=muted,line width=1.2pt] (2.8,2.0) -- (3.8,2.0);
+\end{tikzpicture}
+}%
+\end{figure}
+
+\footnotesize
+
+- **Fits is not seen**: 1M tokens fit, but attention thins as input grows
+- **Symptoms**: forgets earlier edits, skips steps, changes the wrong place
+- **Not a dumber model, a messier desk**: fix the context, not the prompt
+
+\normalsize
+
+\begin{flushright}
+\tiny\textcolor{muted}{Thariq Shihipar (ex-Claude Code team): models start slipping around 300--400k tokens}
+\end{flushright}
+
+## Context hygiene: subtract, don't add
+
+\footnotesize
+
+<!--prettier-ignore-->
+| Move | Target | Do this |
+| :------------ | :-------------------------------- | :-------------------------------------- |
+| **Clean** | Dead code, stale drafts | Delete; one place per rule |
+| **Delegate** | Reading 30 files or 50 pages | Sub-agent returns one page |
+| **Cap files** | 3,000-line files | Commit hook: max 5k tokens (~20 KB) |
+| **Slim** | `AGENTS.md`, MCPs, skills | Under 100 lines; enable per project |
+| **Reset** | Long chats | `/compact` or `/clear`; read `git log` |
+
+\normalsize
+\vspace{6pt}
+
+\footnotesize
+
+- **Search before writing**: have the agent find the existing code first
+- **Block, don't remind**: a hook or lint beats a line in `AGENTS.md`
+- **Best memory**: current files + clear commits; memory plugins go stale
+
+\normalsize
+
+\begin{flushright}
+\tiny\textcolor{muted}{File-size hook after Matt Pocock (skips lockfiles \& generated code) · full checklist: the \texttt{tidy} skill}
 \end{flushright}
 
 ## Limitations of agents
@@ -683,7 +906,7 @@ Pick the leaderboard that matches your workload:
   \node[desc] at ([yshift=-5pt]a.south) {Compares \mbox{2--3} stacks you can maintain};
   \node[desc] at ([yshift=-5pt]p.south) {Tests + screenshots instead of ``done''};
   \node[desc] at ([yshift=-5pt]d.south) {Cuts UI back against a checklist};
-  \node[desc] at ([yshift=-5pt]t.south) {Removes duplicates \& dead code; slims \texttt{AGENTS.md}};
+  \node[desc] at ([yshift=-5pt]t.south) {Finds duplicate rules, dead code \& oversized files};
 \end{tikzpicture}
 }%
 \end{center}
@@ -702,8 +925,8 @@ Pick the leaderboard that matches your workload:
 \small
 
 1. **Agent = model + harness + tools**, running a reason $\to$ act $\to$ observe loop
-2. **Context is the agent's only memory**: keep it focused; put lasting rules in `AGENTS.md`
-3. **Pick models by your workload**, not one leaderboard; medium effort by default
+2. **Context is the agent's only memory**: keep it small and clean; put lasting rules in `AGENTS.md`
+3. **Pick models by your workload**, and **cost per task**, not one leaderboard; medium effort by default
 4. **Give specific tasks, demand evidence**: tests and screenshots, not "done"
 5. **Commit before, review after**: Git is your undo button, and you own the result
 
@@ -727,6 +950,8 @@ Pick the leaderboard that matches your workload:
 | **Prompt Caching** | [OpenAI Prompt Caching Guide](https://platform.openai.com/docs/guides/prompt-caching) |
 | **AGENTS.md** | [agents.md: format & examples](https://agents.md/) |
 | **Model Rankings** | [OpenRouter Rankings](https://openrouter.ai/rankings) |
+| **Real Pricing** | [Real API Pricing](https://github.com/Fei2411/real-api-pricing) · [mypriors](https://mypriors.com) |
+| **Relay Security** | [Your Agent Is Mine](https://arxiv.org/abs/2604.08407) |
 | **Benchmarks** | [Terminal-Bench](https://www.tbench.ai/) · [TB-Science](https://github.com/harbor-framework/terminal-bench-science) · [FrontierCS 2](https://arxiv.org/abs/2610.29932) · [WorkBuddy](https://github.com/Tencent/workbuddy-bench) · [AA Index](https://artificialanalysis.ai/) · [llm2014](https://llm2014.github.io/llm_benchmark/) |
 | **MCP** | [Model Context Protocol Documentation](https://modelcontextprotocol.io/docs/getting-started/intro) |
 
@@ -741,10 +966,11 @@ Pick the leaderboard that matches your workload:
 | :--------------- | :------------------------------------------------------- |
 | **DeepSeek Harness** | [Desktop Download](https://www.deepseek.com/en/harness) · [GitHub Repository](https://github.com/deepseek-ai/deepseek-harness) · [Docs](https://deepseek-harness.github.io/deepseek-harness/) · [Safety Notice](https://github.com/deepseek-ai/deepseek-harness/blob/master/SAFETY.md) |
 | **AstroPaper** | [Template Repository](https://github.com/satnaing/astro-paper) · [Live Demo](https://astro-paper.pages.dev/) |
+| **Deploy** | [Astro Deploy Guide](https://docs.astro.build/en/guides/deploy/) · [GitHub Pages](https://pages.github.com/) · [Cloudflare Pages](https://pages.cloudflare.com/) |
 | **Skills** | [nagi-studio/skills](https://github.com/nagi-studio/skills) · [skills CLI](https://github.com/vercel-labs/skills) |
 | **Git** | [Pro Git Book](https://git-scm.com/book/en/v2) |
 | **Sandboxing** | [bubblewrap](https://github.com/containers/bubblewrap) · [Docker Container Basics](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) |
-| **API Gateways** | [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) · [sub2api](https://github.com/Wei-Shaw/sub2api) · [New API](https://github.com/QuantumNous/new-api) |
+| **API Gateways** (self-host only) | [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) · [sub2api](https://github.com/Wei-Shaw/sub2api) · [New API](https://github.com/QuantumNous/new-api) |
 
 \normalsize
 
