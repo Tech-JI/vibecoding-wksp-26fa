@@ -230,8 +230,8 @@ header-includes: |
 | Kind | What it is | When to use |
 | :---------- | :------------------------------------------------------ | :------------------------------ |
 | **Built-in** | Files, shell, Git | Day one: all you need |
-| **Skills** | `SKILL.md` instructions, loaded only when relevant | Repeated workflows |
-| **MCP** | A standard plug for outside services (GitHub, DBs) | After the basics work |
+| **CLI** | Command-line programs: `gh`, `ffmpeg` | Lighter than MCP |
+| **MCP** | A USB-like plug for outside apps | When no CLI exists |
 | **Subagent** | A child agent with its own fresh context | Big, separable subtasks |
 
 \normalsize
@@ -841,6 +841,43 @@ Pick the leaderboard that matches your workload:
 \tiny\textcolor{muted}{File-size hook after Matt Pocock (skips lockfiles \& generated code) · full checklist: the \texttt{tidy} skill}
 \end{flushright}
 
+## Skills, MCP, hooks & plugins: know before you install
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm,line cap=round,line join=round,
+  ext/.style={draw=theme,line width=1.2pt,rounded corners=3pt,minimum width=2.55cm,minimum height=1.75cm,text width=2.4cm,align=center,font=\sffamily\fontsize{9}{11}\selectfont,text=ink,execute at begin node={\hyphenpenalty=10000\relax}},
+  flow/.style={draw=muted!85,line width=1.2pt,-{Stealth[length=2.4mm,width=1.8mm]}}]
+  \node[ext,fill=theme!24] (r) at (0,0) {{\fontsize{11}{13}\selectfont\bfseries\ttfamily AGENTS.md}\\[2pt]House rules\\[2pt]\textcolor{muted}{full text,\\every request}};
+  \node[ext,fill=theme!15] (s) at (2.75,0) {{\fontsize{11}{13}\selectfont\bfseries Skill}\\[2pt]Recipe + scripts\\[2pt]\textcolor{muted}{blurb only;\\body when used}};
+  \node[ext,fill=theme!9] (m) at (5.5,0) {{\fontsize{11}{13}\selectfont\bfseries MCP}\\[2pt]Plug for apps\\[2pt]\textcolor{muted}{tool list;\\can be large}};
+  \node[ext,fill=theme!4] (c) at (8.25,0) {{\fontsize{11}{13}\selectfont\bfseries CLI}\\[2pt]Command to run\\[2pt]\textcolor{muted}{only its\\output}};
+  \node[ext,fill=white] (h) at (11.0,0) {{\fontsize{11}{13}\selectfont\bfseries Hook}\\[2pt]Hard gate\\[2pt]\textcolor{muted}{runs outside\\the model}};
+  % context-cost axis
+  \draw[flow] (-1.3,-1.25) -- (12.3,-1.25);
+  \node[anchor=north west,font=\sffamily\fontsize{9}{11}\selectfont,text=muted] at (-1.3,-1.35) {always in context};
+  \node[anchor=north east,font=\sffamily\fontsize{9}{11}\selectfont,text=muted] at (12.3,-1.35) {never in context};
+  % plugin bracket
+  \draw[draw=theme,line width=1.1pt] ([yshift=4pt]s.north west) -- ++(0,0.22) -| ([yshift=4pt]h.north east);
+  \node[anchor=south,font=\sffamily\fontsize{9.5}{11}\selectfont,text=ink] at (6.875,1.23) {\textbf{Plugin} = a box of these, one-click install \textcolor{muted}{(DSH: can also swap app parts)}};
+\end{tikzpicture}
+}%
+\end{figure}
+
+\footnotesize
+
+- **Before installing**: is it a recipe, a tool, a gate, or a box?
+- **Know the skill you want?** Call it by name: `/prove-it`
+- **Same throwaway script again?** Save it as a small CLI
+- **Prune every 1--2 weeks**: Claude Code `/doctor`; Codex \& DSH `checkup`
+
+\normalsize
+
+\begin{flushright}
+\tiny\textcolor{muted}{\texttt{checkup} (nagi-studio/skills): read-only scan of the last 30 days; you confirm, and it disables reversibly}
+\end{flushright}
+
 ## Limitations of agents
 
 \footnotesize
@@ -902,11 +939,13 @@ Pick the leaderboard that matches your workload:
   \node[chev] (p) at (5.3,0) {prove-it};
   \node[chev] (d) at (7.95,0) {de-slop};
   \node[chev] (t) at (10.6,0) {tidy};
+  \node[chev] (k) at (13.25,0) {checkup};
   \node[desc] at ([yshift=-5pt]g.south) {Questions you until the plan is clear};
   \node[desc] at ([yshift=-5pt]a.south) {Compares \mbox{2--3} stacks you can maintain};
   \node[desc] at ([yshift=-5pt]p.south) {Tests + screenshots instead of ``done''};
   \node[desc] at ([yshift=-5pt]d.south) {Cuts UI back against a checklist};
   \node[desc] at ([yshift=-5pt]t.south) {Finds duplicate rules, dead code \& oversized files};
+  \node[desc] at ([yshift=-5pt]k.south) {Flags unused skills, MCPs \& plugins};
 \end{tikzpicture}
 }%
 \end{center}
@@ -953,7 +992,7 @@ Pick the leaderboard that matches your workload:
 | **Real Pricing** | [Real API Pricing](https://github.com/Fei2411/real-api-pricing) · [mypriors](https://mypriors.com) |
 | **Relay Security** | [Your Agent Is Mine](https://arxiv.org/abs/2604.08407) |
 | **Benchmarks** | [Terminal-Bench](https://www.tbench.ai/) · [TB-Science](https://github.com/harbor-framework/terminal-bench-science) · [FrontierCS 2](https://arxiv.org/abs/2610.29932) · [WorkBuddy](https://github.com/Tencent/workbuddy-bench) · [AA Index](https://artificialanalysis.ai/) · [llm2014](https://llm2014.github.io/llm_benchmark/) |
-| **MCP** | [Model Context Protocol Documentation](https://modelcontextprotocol.io/docs/getting-started/intro) |
+| **MCP \& Hooks** | [MCP Documentation](https://modelcontextprotocol.io/docs/getting-started/intro) · [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide) |
 
 \normalsize
 
